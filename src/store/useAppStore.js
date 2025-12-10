@@ -13,6 +13,10 @@ const useAppStore = create(
       isSceneReady: false,
       setSceneReady: (value) => set({ isSceneReady: value }),
 
+      // Stato caricamento asset critici (Fase 1: Flamingo)
+      criticalAssetsLoaded: false,
+      setCriticalAssetsLoaded: (value) => set({ criticalAssetsLoaded: value }),
+
       // Stato dell'isola corrente
       currentStage: 2,
       setCurrentStage: (stage) => set({ currentStage: stage }),
@@ -28,7 +32,7 @@ const useAppStore = create(
       },
       resetInteraction: () => set({ hasInteracted: false }),
 
-      // Progress di caricamento
+      // Progress di caricamento (0-100)
       loadingProgress: 0,
       setLoadingProgress: (progress) => set({ loadingProgress: progress }),
 
@@ -41,6 +45,7 @@ const useAppStore = create(
         set({
           hasVisited: false,
           isSceneReady: false,
+          criticalAssetsLoaded: false,
           currentStage: 1,
           isInteracting: false,
           hasInteracted: false,

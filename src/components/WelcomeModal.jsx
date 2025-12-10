@@ -1,44 +1,43 @@
 // src/components/WelcomeModal.jsx
-import React, { useEffect } from 'react'
+import React from 'react'
 import useAppStore from '../store/useAppStore'
+import Loader from './Loader'
 
 /**
- * WelcomeModal - Modale introduttiva
- * Appare ad ogni refresh della pagina o nuova sessione
- * Gestita da Zustand store con sessionStorage
+ * WelcomeModal - Modale introduttiva con loading reale
+ *
+ * COMPORTAMENTO:
+ * - Mostra il progresso reale di caricamento degli asset
+ * - Si chiude solo quando loadingProgress >= 100%
+ * - Utilizza criticalAssetsLoaded per early interaction (opzionale)
+ *
+ * UX IMPROVEMENTS:
+ * - Loading bar realistico basato su asset effettivi
+ * - Disabilita pulsante fino a completamento
+ * - Feedback visivo chiaro sullo stato
  */
 const WelcomeModal = () => {
   const hasVisited = useAppStore((state) => state.hasVisited)
   const setHasVisited = useAppStore((state) => state.setHasVisited)
   const loadingProgress = useAppStore((state) => state.loadingProgress)
+  const isSceneReady = useAppStore((state) => state.isSceneReady)
 
-  const isLoaded = loadingProgress >= 100
+  const isLoaded = isSceneReady && loadingProgress >= 100
   const isOpen = !hasVisited
 
-  // Simula loading progressivo se necessario
-  useEffect(() => {
-    console.log('[WelcomeModal] isOpen:', isOpen, 'isLoaded:', isLoaded)
-    if (!isOpen || isLoaded) return
-
-    const interval = setInterval(() => {
-      useAppStore.setState((state) => ({
-        loadingProgress: Math.min(state.loadingProgress + Math.random() * 15 + 5, 100),
-      }))
-    }, 300)
-
-    return () => clearInterval(interval)
-  }, [isOpen, isLoaded])
-
   const handleClose = () => {
-    if (!isLoaded) return
-    console.log('[WelcomeModal] Closing modal and setting hasVisited to true')
+    if (!isLoaded) {
+      console.warn('[WelcomeModal] Tentativo di chiusura prematura - loading non completo')
+      return
+    }
+    console.log('[WelcomeModal] Closing modal - Scene ready!')
     setHasVisited(true)
   }
 
   if (!isOpen) return null
 
   return (
-    <div className='welcome-modal fixed inset-0 flex items-center justify-between bg-black bg-opacity-60 backdrop-blur-sm cursor-default'>
+    <div className='welcome-modal fixed inset-0 flex items-center justify-between bg-black bg-opacity-50 backdrop-blur-sm cursor-default z-[9999]'>
       {/* Contenuto */}
       <div className='modal-content'>
         <h1 className='modal-title flex flex-col text-4xl lg:text-7xl'>
@@ -71,7 +70,7 @@ const WelcomeModal = () => {
             transition-all 
             duration-300
             text-nowrap
-            ${isLoaded ? 'cursor-pointer hover:border-blue-400' : 'cursor-not-allowed'}
+            ${isLoaded ? 'cursor-pointer hover:border-blue-400 hover:scale-[1.02]' : 'cursor-not-allowed opacity-90'}
           `}
           style={{
             background: `linear-gradient(90deg, 
@@ -82,7 +81,7 @@ const WelcomeModal = () => {
           <span className='relative z-10 flex items-center justify-center h-full font-semibold'>
             {isLoaded ? (
               <>
-                <span className='mr-2 '>✨</span>
+                <span className='mr-2 animate-pulse'>✨</span>
                 Go to the island
               </>
             ) : (
@@ -93,6 +92,15 @@ const WelcomeModal = () => {
             )}
           </span>
         </button>
+
+        {/* Progress details (optional debug info)*/}
+        {!isLoaded && (
+          <Loader />
+          // <div className='mt-4 text-xs text-gray-400 text-center'>
+          //   {loadingProgress < 40 && 'Loading flamingo...'}
+          //   {loadingProgress >= 40 && loadingProgress < 100 && 'Loading island...'}
+          // </div>
+        )}
       </div>
     </div>
   )

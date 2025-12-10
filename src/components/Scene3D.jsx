@@ -2,13 +2,25 @@ import React, { Suspense, useRef, useMemo, useCallback, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { Loader, PostProcessing } from '../components'
+import { PostProcessing } from '../components'
 import { Flamingo, Island, Plumbob } from '../models'
 import { getAllIslands } from '../constants/islandConfig'
 import useAppStore from '../store/useAppStore'
 import useSceneInteraction from '../hooks/useSceneInteraction'
 import useCameraInitializer from '../hooks/useCameraInitializer'
 
+/**
+ * Scene3D Component - Ottimizzato con Progressive Rendering
+ *
+ * PROGRESSIVE RENDERING STRATEGY:
+ * 1. Mostra sempre Canvas + Lights + Stars (instant feedback)
+ * 2. Flamingo appare appena caricato (Fase 1: 0-40%)
+ * 3. Island appare quando pronta (Fase 2: 40-100%)
+ * 4. Altri elementi in background
+ *
+ * REMOVED: <Suspense> wrapper con Loader component
+ * WHY: Loader duplicava WelcomeModal, creando double loading screen
+ */
 const Scene3D = () => {
   // Ref per i controlli (aggiornato tramite callback)
   const controlsRef = useRef(null)
@@ -20,6 +32,8 @@ const Scene3D = () => {
   const flamingoInfo = useAppStore((state) => state.flamingoInfo)
   const setFlamingoInfo = useAppStore((state) => state.setFlamingoInfo)
   const hasVisited = useAppStore((state) => state.hasVisited)
+  const criticalAssetsLoaded = useAppStore((state) => state.criticalAssetsLoaded)
+  const isSceneReady = useAppStore((state) => state.isSceneReady)
 
   // Custom hooks: passiamo controlsRef + ready flag
   useSceneInteraction(controlsRef, controlsReady)
@@ -109,51 +123,53 @@ const Scene3D = () => {
     controlsRef.current = ctrl
     setControlsReady(Boolean(ctrl))
     // debug veloce:
-    if (ctrl) {
-      // console.log('[Scene3D] OrbitControls mounted (ref ok)')
-    } else {
-      // console.log('[Scene3D] OrbitControls unmounted (ref null)')
-    }
+    // if (ctrl) {
+    // console.log('[Scene3D] OrbitControls mounted (ref ok)')
+    // } else {
+    // console.log('[Scene3D] OrbitControls unmounted (ref null)')
+    // }
   }
 
   return (
     <>
       <Leva collapsed hidden />
 
-      <Suspense fallback={<Loader />}>
-        <Canvas
-          className='w-full h-screen inset-0 z-0'
-          camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}
-          dpr={[1, 2]}
-          performance={{ min: 0.5 }}>
-          {/* makeDefault direttamente sul JSX: stabilità e coerenza con useThree() */}
-          <OrbitControls
-            ref={orbitRefCallback}
-            makeDefault
-            {...orbitControlsProps}
-            // onStart={() => console.log('[OrbitControls] START')}
-            // onEnd={() => console.log('[OrbitControls] END')}
-          />
+      <Canvas
+        className='w-full h-screen inset-0 z-0'
+        camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}
+        dpr={[1, 2]}
+        performance={{ min: 0.5 }}>
+        {/* OrbitControls */}
+        <OrbitControls ref={orbitRefCallback} makeDefault {...orbitControlsProps} />
 
-          {lights}
+        {/* Always visible */}
+        {lights}
+        <Stars radius={70} depth={50} count={1200} factor={8} saturation={0.08} speed={0.2} fade />
 
-          <Stars radius={70} depth={50} count={1200} factor={8} saturation={0.08} speed={0.2} fade />
+        {/* Progressive Rendering: Flamingo (Critical Asset - Fase 1) */}
+        {criticalAssetsLoaded && (
+          <Suspense fallback={null}>
+            <Flamingo
+              rotSpeedFactor={rotSpeed}
+              onIslandChange={handleIslandChange}
+              onPositionUpdate={handleFlamingoPositionUpdate}
+            />
+          </Suspense>
+        )}
 
-          <Flamingo
-            rotSpeedFactor={rotSpeed}
-            onIslandChange={handleIslandChange}
-            onPositionUpdate={handleFlamingoPositionUpdate}
-          />
+        {/* Progressive Rendering: Island + Plumbobs (Important Assets - Fase 2) */}
+        {isSceneReady && (
+          <Suspense fallback={null}>
+            <group position={[0, -3, 0]}>
+              {plumbobs}
+              <Island position={[0, 0, 0]} rotation={[0, 0, 0]} scale={1} />
+            </group>
+          </Suspense>
+        )}
 
-          <group position={[0, -3, 0]}>
-            {plumbobs}
-            <Island position={[0, 0, 0]} rotation={[0, 0, 0]} scale={1} />
-          </group>
-
-          {/* Post-Processing Effects */}
-          <PostProcessing />
-        </Canvas>
-      </Suspense>
+        {/* Post-Processing Effects */}
+        <PostProcessing />
+      </Canvas>
     </>
   )
 }
