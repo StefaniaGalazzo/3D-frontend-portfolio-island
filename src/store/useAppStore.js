@@ -5,23 +5,23 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 const useAppStore = create(
   persist(
     (set, get) => ({
-      // Stato della visita - NON persiste
+      // Modal visita
       hasVisited: false,
       setHasVisited: (value) => set({ hasVisited: value }),
 
-      // Stato del canvas e della scena 3D
+      // Stato principale della scena
       isSceneReady: false,
       setSceneReady: (value) => set({ isSceneReady: value }),
 
-      // Stato caricamento asset critici (Fase 1: Flamingo)
+      // Asset critici (se vuoi usarli)
       criticalAssetsLoaded: false,
       setCriticalAssetsLoaded: (value) => set({ criticalAssetsLoaded: value }),
 
-      // Stato dell'isola corrente
+      // Stages dell’isola
       currentStage: 2,
       setCurrentStage: (stage) => set({ currentStage: stage }),
 
-      // Stato dell'interazione utente
+      // Interazioni utente
       isInteracting: false,
       hasInteracted: false,
       setIsInteracting: (value) => {
@@ -32,15 +32,15 @@ const useAppStore = create(
       },
       resetInteraction: () => set({ hasInteracted: false }),
 
-      // Progress di caricamento (0-100)
+      // PROGRESS REALE DI CARICAMENTO
       loadingProgress: 0,
       setLoadingProgress: (progress) => set({ loadingProgress: progress }),
 
-      // Info del flamingo
+      // Extra info del modello flamingo
       flamingoInfo: null,
       setFlamingoInfo: (info) => set({ flamingoInfo: info }),
 
-      // Reset completo
+      // Reset completo della sessione (modal + scena)
       reset: () =>
         set({
           hasVisited: false,
@@ -56,7 +56,7 @@ const useAppStore = create(
     {
       name: 'app-storage',
       storage: createJSONStorage(() => sessionStorage),
-      // Non persistiamo NULLA - tutto si resetta al refresh
+      // Non persistiamo nulla (sessione effimera)
       partialize: () => ({}),
     }
   )

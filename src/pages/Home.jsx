@@ -4,15 +4,6 @@ import { HomeInfo, WelcomeModal, DragCursor, Scene3D } from '../components'
 import useAppStore from '../store/useAppStore'
 import { usePreloadAssets } from '../hooks'
 
-/**
- * Home Page - Entry point con Progressive Loading
- * 
- * RENDERING STRATEGY:
- * 1. WelcomeModal sempre visibile all'inizio (overlay completo)
- * 2. Scene3D sempre renderizzato (progressive loading interno)
- * 3. DragCursor appare dopo chiusura modale
- * 4. HomeInfo appare quando scena è pronta
- */
 export default function Home() {
   // Initialize asset loading
   usePreloadAssets()

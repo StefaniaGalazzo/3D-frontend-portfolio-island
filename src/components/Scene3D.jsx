@@ -133,7 +133,6 @@ const Scene3D = () => {
   return (
     <>
       <Leva collapsed hidden />
-
       <Canvas
         className='w-full h-screen inset-0 z-0'
         camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}
@@ -148,25 +147,18 @@ const Scene3D = () => {
 
         {/* Progressive Rendering: Flamingo (Critical Asset - Fase 1) */}
         {criticalAssetsLoaded && (
-          <Suspense fallback={null}>
-            <Flamingo
-              rotSpeedFactor={rotSpeed}
-              onIslandChange={handleIslandChange}
-              onPositionUpdate={handleFlamingoPositionUpdate}
-            />
-          </Suspense>
+          <Flamingo
+            rotSpeedFactor={rotSpeed}
+            onIslandChange={handleIslandChange}
+            onPositionUpdate={handleFlamingoPositionUpdate}
+          />
         )}
-
-        {/* Progressive Rendering: Island + Plumbobs (Important Assets - Fase 2) */}
         {isSceneReady && (
-          <Suspense fallback={null}>
-            <group position={[0, -3, 0]}>
-              {plumbobs}
-              <Island position={[0, 0, 0]} rotation={[0, 0, 0]} scale={1} />
-            </group>
-          </Suspense>
+          <group position={[0, -3, 0]}>
+            {plumbobs}
+            <Island position={[0, 0, 0]} rotation={[0, 0, 0]} scale={1} />
+          </group>
         )}
-
         {/* Post-Processing Effects */}
         <PostProcessing />
       </Canvas>

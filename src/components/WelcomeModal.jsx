@@ -3,19 +3,6 @@ import React from 'react'
 import useAppStore from '../store/useAppStore'
 import Loader from './Loader'
 
-/**
- * WelcomeModal - Modale introduttiva con loading reale
- *
- * COMPORTAMENTO:
- * - Mostra il progresso reale di caricamento degli asset
- * - Si chiude solo quando loadingProgress >= 100%
- * - Utilizza criticalAssetsLoaded per early interaction (opzionale)
- *
- * UX IMPROVEMENTS:
- * - Loading bar realistico basato su asset effettivi
- * - Disabilita pulsante fino a completamento
- * - Feedback visivo chiaro sullo stato
- */
 const WelcomeModal = () => {
   const hasVisited = useAppStore((state) => state.hasVisited)
   const setHasVisited = useAppStore((state) => state.setHasVisited)
@@ -94,13 +81,7 @@ const WelcomeModal = () => {
         </button>
 
         {/* Progress details (optional debug info)*/}
-        {!isLoaded && (
-          <Loader />
-          // <div className='mt-4 text-xs text-gray-400 text-center'>
-          //   {loadingProgress < 40 && 'Loading flamingo...'}
-          //   {loadingProgress >= 40 && loadingProgress < 100 && 'Loading island...'}
-          // </div>
-        )}
+        {!isLoaded && <Loader />}
       </div>
     </div>
   )

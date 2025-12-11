@@ -7,7 +7,7 @@ import flamingoModel from '../assets/3d/flamingo.glb'
 import { getAllIslands, findNearestIsland } from '../constants/islandConfig'
 
 // Preload del modello
-useGLTF.preload(flamingoModel)
+// useGLTF.preload(flamingoModel)
 
 // utility: normalizza angoli in [-PI, PI]
 function normalizeAngle(a) {
