@@ -22,11 +22,6 @@ import bootstrap from './bootstrap.png'
 import tailwindcss from './tailwindcss.svg'
 import typescript from './typescript.svg'
 import linkedin from './linkedin.svg'
-import twitter from './twitter.svg'
-import car from './car.svg'
-import estate from './estate.svg'
-import snapgram from './snapgram.svg'
-import summiz from './summiz.svg'
 import arrow from './arrow.svg'
 import contact from './contact.svg'
 import soundon from './soundon.png'
@@ -62,12 +57,7 @@ export {
   tailwindcss,
   typescript,
   linkedin,
-  twitter,
-  car,
   threejs,
-  estate,
-  snapgram,
-  summiz,
   arrow,
   contact,
   soundon,
