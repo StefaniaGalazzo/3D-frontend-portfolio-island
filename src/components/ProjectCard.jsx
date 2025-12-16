@@ -33,7 +33,7 @@ const ProjectCard = ({ project }) => {
               <img src={arrow} alt='' className='w-4 h-4 object-contain' />
             </>
           ) : (
-            <p>Work in progress</p>
+            <p>{project?.label || 'Work in progress'}</p>
           )}
         </div>
       </div>

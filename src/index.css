@@ -16,7 +16,7 @@ body {
   font-optical-sizing: auto;
   font-style: normal;
   font-variation-settings: 'wdth' 100;
-  background: linear-gradient(to bottom, #000000 10%, #100d62 80%, #212083 100%);
+  background: linear-gradient(to bottom, #02094e 15%, #004e92 80%, #02094e 100%);
 }
 header,
 #burger-menu {
@@ -41,7 +41,7 @@ header,
 
   .blue-gradient_text {
     /* background: linear-gradient(90deg, #733aec, var(--accent-blue), #4e15ca); */
-    @apply bg-gradient-to-r from-[#733aec] to-[#4e15ca] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#2196F3] to-[#00BCD4] bg-clip-text text-transparent;
   }
 
   .input {

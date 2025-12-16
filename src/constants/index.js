@@ -227,8 +227,9 @@ export const projects = [
     iconUrl: smartnotes,
     theme: 'btn-back-green',
     name: 'Smart Notes',
-    description: 'AI-powered note-taking assistant: rewrite, make an easy to do list, improve your text.',
+    description: 'AI-powered note-taking assistant: rewrite, make a to do list, improve your text.',
     // link: '',
+    label: 'Built with Express as a backend service',
   },
   {
     iconUrl: p5j,
