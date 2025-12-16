@@ -21,7 +21,7 @@ const WelcomeModal = () => {
   if (!isOpen) return null
 
   return (
-    <div className='welcome-modal fixed inset-0 flex items-center justify-between bg-black bg-opacity-50 backdrop-blur-sm cursor-default z-[9999]'>
+    <div className='welcome-modal fixed inset-0 flex items-center justify-between cursor-default z-[9999]'>
       <div className='modal-content'>
         <h1 className='modal-title flex flex-col text-4xl lg:text-7xl'>
           <span>Hello there!</span>
