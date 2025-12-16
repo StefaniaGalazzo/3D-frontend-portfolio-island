@@ -90,7 +90,6 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [isFlying, isFlyingAway])
 
-  // Usa Clone component di drei (più robusto)
   return (
     <group ref={group} position={position} rotation={rotation} scale={[0.9, 0.9, 0.9]}>
       <Clone object={scene} scale={0.025} />
