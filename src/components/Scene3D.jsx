@@ -122,13 +122,12 @@ const Scene3D = () => {
           powerPreference: 'high-performance',
           alpha: false,
         }}>
-        {/* Gradient Background nativo Three.js */}
         <GradientBackground />
 
         <OrbitControls ref={orbitRefCallback} makeDefault {...orbitControlsProps} />
 
         {lights}
-        <Stars radius={70} depth={50} count={1200} factor={8} saturation={0.08} speed={0.2} fade />
+        <Stars radius={70} depth={50} count={1000} factor={8} saturation={0.08} speed={0.2} fade />
 
         {criticalAssetsLoaded && (
           <Suspense fallback={null}>

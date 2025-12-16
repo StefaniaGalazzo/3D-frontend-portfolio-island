@@ -10,6 +10,18 @@
       rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stefania Galazzo | Portfolio Island</title>
+    
+    <!-- GitHub Pages SPA Redirect Script -->
+    <script>
+      // Recupera il path salvato dal 404.html
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
