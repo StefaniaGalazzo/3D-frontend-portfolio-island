@@ -14,11 +14,7 @@ const WelcomeModal = () => {
   const isOpen = !hasVisited
 
   const handleClose = () => {
-    if (!canClose) {
-      console.warn('[WelcomeModal] Tentativo chiusura prematura - modelli non renderizzati')
-      return
-    }
-    console.log('[WelcomeModal] Chiusura modale - Modelli pronti!')
+    if (!canClose) return
     setHasVisited(true)
   }
 
@@ -84,7 +80,8 @@ const WelcomeModal = () => {
           </span>
         </button>
 
-        {!canClose && <Loader />}
+        {/* Loader con isComplete quando tutto pronto */}
+        <Loader isComplete={canClose} />
       </div>
     </div>
   )
