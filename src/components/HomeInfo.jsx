@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { arrow } from '../assets/icons'
+// import { Link } from 'react-router-dom'
+// import { arrow } from '../assets/icons'
 
 const STAGES = {
   1: {
@@ -34,12 +34,12 @@ const HomeInfo = ({ currentStage }) => {
 
       {data.text2 && <p className='text-center sm:text-md'>{data.text2}</p>}
 
-      <Link
+      {/* <Link
         to={data.linkTo}
         className='flex items-center justify-center mt-2 pointer-events-auto cursor-pointer transition-colors'>
         {data.linkLabel}
         <img src={arrow} alt='arrow' className='w-4 h-4 object-contain ms-3' />
-      </Link>
+      </Link> */}
     </div>
   )
 }

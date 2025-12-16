@@ -11,6 +11,7 @@ import PostProcessing from './PostProcessing'
 import CustomCursor from './CustomCursor'
 import DragCursor from './DragCursor'
 import GradientBackground from './GradientBackground'
+import PlumbobLabel from './PlumbobLabel'
 
 export { 
   CTA, 
@@ -25,5 +26,6 @@ export {
   PostProcessing, 
   CustomCursor, 
   DragCursor,
-  GradientBackground 
+  GradientBackground,
+  PlumbobLabel 
 }

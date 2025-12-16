@@ -3,7 +3,7 @@ import React, { Suspense, useRef, useMemo, useCallback, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { PostProcessing } from '../components'
+import { PostProcessing, PlumbobLabel } from '../components'
 import { Flamingo, Island, Plumbob } from '../models'
 import { getAllIslands } from '../constants/islandConfig'
 import useAppStore from '../store/useAppStore'
@@ -98,16 +98,24 @@ const Scene3D = () => {
     [islands, flamingoInfo, currentStage]
   )
 
+  // PlumbobLabels - Stesse coordinate dei plumbob (compensano il group offset)
+  const plumbobLabels = useMemo(
+    () =>
+      islands.map((isle) => (
+        <PlumbobLabel
+          key={`label-${isle.id}`}
+          position={[isle.plumbobOffset.x, isle.plumbobOffset.y - 2.2, isle.plumbobOffset.z]}
+          stage={isle.stage}
+          flamingoInfo={flamingoInfo}
+        />
+      )),
+    [islands, flamingoInfo]
+  )
+
   const orbitRefCallback = useCallback((ctrl) => {
     controlsRef.current = ctrl
     setControlsReady(Boolean(ctrl))
-    // debug veloce:
-    // if (ctrl) {
-    // console.log('[Scene3D] OrbitControls mounted (ref ok)')
-    // } else {
-    // console.log('[Scene3D] OrbitControls unmounted (ref null)')
-    // }
-  })
+  }, [])
 
   return (
     <>
@@ -147,6 +155,9 @@ const Scene3D = () => {
             </group>
           </Suspense>
         )}
+
+        {/* Labels fuori dal group, con offset compensato */}
+        {isSceneReady && hasVisited && plumbobLabels}
 
         <PostProcessing />
       </Canvas>
