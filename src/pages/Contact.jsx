@@ -1,7 +1,7 @@
 import emailjs from '@emailjs/browser'
 import { Canvas } from '@react-three/fiber'
-import { Suspense, useRef, useState, useEffect } from 'react'
-import { useGLTF, useAnimations } from '@react-three/drei'
+import { Suspense, useRef, useState, useEffect, useMemo } from 'react'
+import { useGLTF, useAnimations, Clone } from '@react-three/drei'
 import * as THREE from 'three'
 import flamingoModel from '../assets/3d/flamingo.glb'
 import useAlert from '../hooks/useAlert'
@@ -19,16 +19,16 @@ const sanitize = (value) => {
 
 const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
   const group = useRef()
-  const gltf = useGLTF(flamingoModel)
-  const { actions } = useAnimations(gltf.animations, group)
+  const { scene, animations } = useGLTF(flamingoModel)
+  const { actions } = useAnimations(animations, group)
   const [position, setPosition] = useState([0.5, 0.35, 0])
   const [rotation, setRotation] = useState([12.629, -0.6, 0])
   const flyingAwayRef = useRef(false)
   const floatTime = useRef(0)
 
-  // Verifica che il modello sia caricato correttamente
-  if (!gltf?.scene) {
-    console.warn('[ContactFlamingo] Model not loaded yet')
+  // Guard: verifica che il modello sia caricato
+  if (!scene) {
+    console.warn('[ContactFlamingo] Scene not loaded')
     return null
   }
 
@@ -41,10 +41,10 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
 
     if (isFlying) {
       flyAction.play()
-      flyAction.timeScale = 1.5 // Vola più velocemente quando in focus
+      flyAction.timeScale = 1.5
     } else {
       flyAction.play()
-      flyAction.timeScale = 0.15 // Ali quasi ferme, movimento minimo
+      flyAction.timeScale = 0.15
     }
   }, [actions, isFlying])
 
@@ -77,7 +77,6 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [isFlyingAway, onFlyAwayComplete])
 
-  // Effetto fluttuante quando fermo (ali aperte ma quasi ferme)
   useEffect(() => {
     if (!isFlying && !isFlyingAway) {
       const animate = () => {
@@ -91,12 +90,10 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [isFlying, isFlyingAway])
 
-  console.log('Contact - gltf.scene', gltf?.scene)
-  console.log('contact - gltf?.nodes?.mesh_0', gltf?.nodes?.mesh_0)
-
+  // Usa Clone component di drei (più robusto)
   return (
-    <group ref={group} scale={0.025} position={position} rotation={rotation}>
-      <primitive object={gltf?.scene} />
+    <group ref={group} position={position} rotation={rotation} scale={[0.9, 0.9, 0.9]}>
+      <Clone object={scene} scale={0.025} />
     </group>
   )
 }
