@@ -1,7 +1,6 @@
-// src/components/GradientBackground.jsx
 import React, { useMemo, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
-import { useControls, button, folder } from 'leva'
+import { useControls, folder } from 'leva'
 import * as THREE from 'three'
 
 /**
