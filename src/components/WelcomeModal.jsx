@@ -1,4 +1,3 @@
-// src/components/WelcomeModal.jsx
 import React from 'react'
 import useAppStore from '../store/useAppStore'
 import Loader from './Loader'
@@ -14,18 +13,14 @@ const WelcomeModal = () => {
   const isOpen = !hasVisited
 
   const handleClose = () => {
-    if (!canClose) {
-      console.warn('[WelcomeModal] Tentativo chiusura prematura - modelli non renderizzati')
-      return
-    }
-    console.log('[WelcomeModal] Chiusura modale - Modelli pronti!')
+    if (!canClose) return
     setHasVisited(true)
   }
 
   if (!isOpen) return null
 
   return (
-    <div className='welcome-modal fixed inset-0 flex items-center justify-between bg-black bg-opacity-50 backdrop-blur-sm cursor-default z-[9999]'>
+    <div className='welcome-modal fixed inset-0 flex items-center justify-between cursor-default z-[9999]'>
       <div className='modal-content'>
         <h1 className='modal-title flex flex-col text-4xl lg:text-7xl'>
           <span>Hello there!</span>
@@ -84,7 +79,8 @@ const WelcomeModal = () => {
           </span>
         </button>
 
-        {!canClose && <Loader />}
+        {/* Loader con isComplete quando tutto pronto */}
+        <Loader isComplete={canClose} />
       </div>
     </div>
   )

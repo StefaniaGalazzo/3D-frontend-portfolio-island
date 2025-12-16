@@ -6,22 +6,12 @@ import * as THREE from 'three'
 import flamingoModel from '../assets/3d/flamingo.glb'
 import { getAllIslands, findNearestIsland } from '../constants/islandConfig'
 
-// Preload del modello
-// useGLTF.preload(flamingoModel)
-
-// utility: normalizza angoli in [-PI, PI]
 function normalizeAngle(a) {
   while (a > Math.PI) a -= Math.PI * 2
   while (a < -Math.PI) a += Math.PI * 2
   return a
 }
 
-/**
- * Flamingo Component (Ottimizzato)
- * - Props memoizzate
- * - Callbacks memoizzati
- * - Stato interno ottimizzato
- */
 const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionUpdate }) => {
   const rootRef = useRef(null)
   const { camera, controls } = useThree()
@@ -37,9 +27,9 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     animPlaying: false,
     smoothedSpeed: 0,
     currentIslandId: null,
+    currentStage: null,
   })
 
-  // Configurazione isole (memoizzata)
   const { islands, mainIsland, orbitRadius, orbitCenter, flightHeight } = useMemo(() => {
     const isles = getAllIslands()
     const main = isles.find((i) => i.stage === 1) || isles[0]
@@ -56,7 +46,6 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     }
   }, [])
 
-  // Setup animazione
   useEffect(() => {
     const flyAction = actions?.['flamingo_flyA_'] || Object.values(actions || {})[0]
     if (!flyAction) return
@@ -66,7 +55,6 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     flyAction.play()
   }, [actions])
 
-  // Listener OrbitControls
   useEffect(() => {
     if (!controls) return
     const onStart = () => (state.current.isInteracting = true)
@@ -81,26 +69,22 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     }
   }, [controls])
 
-  // Frame loop
   useFrame((frameState, delta) => {
     if (!rootRef.current || !camera || !controls) return
     const s = state.current
 
-    // Calcola azimuth
     const camPos = camera.position
     const relX = camPos.x - orbitCenter.x
     const relZ = camPos.z - orbitCenter.z
     let azimuth = Math.atan2(relX, relZ)
     azimuth = normalizeAngle(azimuth)
 
-    // Direzione rotazione
     let deltaAzimuth = normalizeAngle(azimuth - s.previousAzimuth)
     s.previousAzimuth = azimuth
     s.azimuth = azimuth
 
     const isMovingCounterClockwise = deltaAzimuth > 0
 
-    // Posizione flamingo
     const targetPos = new THREE.Vector3(
       orbitCenter.x + Math.sin(azimuth) * orbitRadius,
       flightHeight,
@@ -113,7 +97,6 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     cur.y += (targetPos.y - cur.y) * lerpFactor
     cur.z += (targetPos.z - cur.z) * lerpFactor
 
-    // Orientamento
     let targetRotationY = azimuth + Math.PI / 2
     if (!isMovingCounterClockwise && Math.abs(deltaAzimuth) > 0.001) {
       targetRotationY += Math.PI
@@ -122,7 +105,6 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     let dRot = normalizeAngle(targetRotationY - rootRef.current.rotation.y)
     rootRef.current.rotation.y += dRot * 0.18
 
-    // Velocità
     let controlsAz = null
     try {
       controlsAz = typeof controls.getAzimuthalAngle === 'function' ? controls.getAzimuthalAngle() : azimuth
@@ -136,7 +118,6 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
     const angularSpeed = Math.abs(deltaAng) / Math.max(delta, 1e-6)
     s.smoothedSpeed += (angularSpeed - s.smoothedSpeed) * 0.12
 
-    // Animazione ali
     const flyAction = actions?.['flamingo_flyA_'] || Object.values(actions || {})[0]
     if (flyAction) {
       const userInteracting = s.isInteracting || s.smoothedSpeed > 0.01
@@ -164,15 +145,21 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
 
     if (nearestIsland && nearestIsland.id !== s.currentIslandId) {
       s.currentIslandId = nearestIsland.id
+      s.currentStage = nearestIsland.stage  // ← AGGIUNTO
+      
       if (onIslandChange) {
         onIslandChange(nearestIsland.stage)
       }
     }
 
-    // Notifica posizione
+    // Notifica posizione con currentStage
     if (onPositionUpdate) {
       const posCopy = new THREE.Vector3(cur.x, cur.y, cur.z)
-      onPositionUpdate({ position: posCopy, azimuth })
+      onPositionUpdate({ 
+        position: posCopy, 
+        azimuth,
+        currentStage: s.currentStage || nearestIsland?.stage || 1  // ← AGGIUNTO
+      })
     }
   })
 

@@ -38,7 +38,8 @@ export const DUOTONE_PRESETS = {
   moodyBlue: {
     name: 'Moody Blue',
     darkColor: '#0f0f23',
-    lightColor: '#5e7ce2',
+    // lightColor: '#5e7ce2',
+    lightColor: '#4c76ff',
     mixFactor: 0.63,
     vignette: { offset: 0.35, darkness: 0.7 },
   },

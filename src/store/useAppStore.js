@@ -23,11 +23,18 @@ const useAppStore = create(
         set({ criticalAssetsLoaded: value })
       },
 
-      // NUOVO: I modelli sono effettivamente renderizzati e visibili
+      // I modelli sono effettivamente renderizzati e visibili
       modelsRendered: false,
       setModelsRendered: (value) => {
         console.log('[Store] modelsRendered:', value)
         set({ modelsRendered: value })
+      },
+
+      // PostProcessing pronto (lazy load)
+      postProcessingReady: false,
+      setPostProcessingReady: (value) => {
+        console.log('[Store] postProcessingReady:', value)
+        set({ postProcessingReady: value })
       },
 
       // Stages dell'isola
@@ -63,6 +70,7 @@ const useAppStore = create(
           isSceneReady: false,
           criticalAssetsLoaded: false,
           modelsRendered: false,
+          postProcessingReady: false,
           currentStage: 1,
           isInteracting: false,
           hasInteracted: false,

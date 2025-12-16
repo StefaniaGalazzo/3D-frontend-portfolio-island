@@ -7,21 +7,30 @@ import flamingoModel from '../assets/3d/flamingo.glb'
 import useAlert from '../hooks/useAlert'
 import { Alert, Loader } from '../components'
 
+// Preload del modello
+useGLTF.preload(flamingoModel)
+
 const sanitize = (value) => {
   return value
-    .replace(/<[^>]*>/g, '') // rimuove tag HTML
-    .replace(/\s+/g, ' ') // comprime spazi
-    .trim() // rimuove spazi iniziali/finali
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
   const group = useRef()
-  const { nodes, materials, animations } = useGLTF(flamingoModel)
-  const { actions } = useAnimations(animations, group)
+  const gltf = useGLTF(flamingoModel)
+  const { actions } = useAnimations(gltf.animations, group)
   const [position, setPosition] = useState([0.5, 0.35, 0])
   const [rotation, setRotation] = useState([12.629, -0.6, 0])
   const flyingAwayRef = useRef(false)
   const floatTime = useRef(0)
+
+  // Verifica che il modello sia caricato correttamente
+  if (!gltf?.scene) {
+    console.warn('[ContactFlamingo] Model not loaded yet')
+    return null
+  }
 
   useEffect(() => {
     const flyAction = actions?.['flamingo_flyA_'] || Object.values(actions || {})[0]
@@ -39,7 +48,6 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [actions, isFlying])
 
-  // Gestione del volo via
   useEffect(() => {
     if (isFlyingAway && !flyingAwayRef.current) {
       flyingAwayRef.current = true
@@ -83,9 +91,12 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [isFlying, isFlyingAway])
 
+  console.log('Contact - gltf.scene', gltf?.scene)
+  console.log('contact - gltf?.nodes?.mesh_0', gltf?.nodes?.mesh_0)
+
   return (
-    <group ref={group} position={position} rotation={rotation} scale={[0.9, 0.9, 0.9]} dispose={null}>
-      <group scale={0.025}>{nodes?.mesh_0 && <primitive object={nodes.mesh_0} />}</group>
+    <group ref={group} scale={0.025} position={position} rotation={rotation}>
+      <primitive object={gltf?.scene} />
     </group>
   )
 }

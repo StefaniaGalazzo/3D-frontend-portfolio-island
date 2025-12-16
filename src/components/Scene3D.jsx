@@ -3,7 +3,7 @@ import React, { Suspense, useRef, useMemo, useCallback, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { PostProcessing } from '../components'
+import { PostProcessing, PlumbobLabel } from '../components'
 import { Flamingo, Island, Plumbob } from '../models'
 import { getAllIslands } from '../constants/islandConfig'
 import useAppStore from '../store/useAppStore'
@@ -98,20 +98,28 @@ const Scene3D = () => {
     [islands, flamingoInfo, currentStage]
   )
 
+  // PlumbobLabels - Stesse coordinate dei plumbob (compensano il group offset)
+  const plumbobLabels = useMemo(
+    () =>
+      islands.map((isle) => (
+        <PlumbobLabel
+          key={`label-${isle.id}`}
+          position={[isle.plumbobOffset.x, isle.plumbobOffset.y - 2.2, isle.plumbobOffset.z]}
+          stage={isle.stage}
+          flamingoInfo={flamingoInfo}
+        />
+      )),
+    [islands, flamingoInfo]
+  )
+
   const orbitRefCallback = useCallback((ctrl) => {
     controlsRef.current = ctrl
     setControlsReady(Boolean(ctrl))
-    // debug veloce:
-    // if (ctrl) {
-    // console.log('[Scene3D] OrbitControls mounted (ref ok)')
-    // } else {
-    // console.log('[Scene3D] OrbitControls unmounted (ref null)')
-    // }
-  })
+  }, [])
 
   return (
     <>
-      <Leva collapsed hidden />
+      <Leva collapsed />
       <Canvas
         className='w-full h-screen inset-0 z-0'
         camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}
@@ -122,13 +130,12 @@ const Scene3D = () => {
           powerPreference: 'high-performance',
           alpha: false,
         }}>
-        {/* Gradient Background nativo Three.js */}
         <GradientBackground />
 
         <OrbitControls ref={orbitRefCallback} makeDefault {...orbitControlsProps} />
 
         {lights}
-        <Stars radius={70} depth={50} count={1200} factor={8} saturation={0.08} speed={0.2} fade />
+        <Stars radius={70} depth={50} count={1000} factor={8} saturation={0.08} speed={0.2} fade />
 
         {criticalAssetsLoaded && (
           <Suspense fallback={null}>
@@ -148,6 +155,9 @@ const Scene3D = () => {
             </group>
           </Suspense>
         )}
+
+        {/* Labels fuori dal group, con offset compensato */}
+        {isSceneReady && hasVisited && plumbobLabels}
 
         <PostProcessing />
       </Canvas>
