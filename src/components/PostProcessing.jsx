@@ -93,10 +93,10 @@ const PostProcessing = () => {
       {/* DuoTone Effect */}
       {duoToneEffect && <primitive object={duoToneEffect} />}
 
-      {/* Vignette Effect */}
+      {/* Vignette Effect
       {duoToneControls.vignetteEnabled && (
         <Vignette offset={duoToneControls.vignetteOffset} darkness={duoToneControls.vignetteDarkness} />
-      )}
+      )} */}
 
       {/* Bloom Effect (optional) */}
       {duoToneControls.bloomEnabled && (

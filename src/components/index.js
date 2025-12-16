@@ -10,5 +10,20 @@ import Scene3D from './Scene3D'
 import PostProcessing from './PostProcessing'
 import CustomCursor from './CustomCursor'
 import DragCursor from './DragCursor'
+import GradientBackground from './GradientBackground'
 
-export { CTA, Alert, Loader, Navbar, Footer, HomeInfo, DragToExplore, WelcomeModal, Scene3D, PostProcessing, CustomCursor, DragCursor }
+export { 
+  CTA, 
+  Alert, 
+  Loader, 
+  Navbar, 
+  Footer, 
+  HomeInfo, 
+  DragToExplore, 
+  WelcomeModal, 
+  Scene3D, 
+  PostProcessing, 
+  CustomCursor, 
+  DragCursor,
+  GradientBackground 
+}

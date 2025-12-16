@@ -7,17 +7,18 @@ const WelcomeModal = () => {
   const hasVisited = useAppStore((state) => state.hasVisited)
   const setHasVisited = useAppStore((state) => state.setHasVisited)
   const loadingProgress = useAppStore((state) => state.loadingProgress)
-  const isSceneReady = useAppStore((state) => state.isSceneReady)
+  const modelsRendered = useAppStore((state) => state.modelsRendered)
 
-  const isLoaded = isSceneReady && loadingProgress >= 100
+  // Pulsante abilitato SOLO quando i modelli sono renderizzati
+  const canClose = modelsRendered && loadingProgress >= 100
   const isOpen = !hasVisited
 
   const handleClose = () => {
-    if (!isLoaded) {
-      console.warn('[WelcomeModal] Tentativo di chiusura prematura - loading non completo')
+    if (!canClose) {
+      console.warn('[WelcomeModal] Tentativo chiusura prematura - modelli non renderizzati')
       return
     }
-    console.log('[WelcomeModal] Closing modal - Scene ready!')
+    console.log('[WelcomeModal] Chiusura modale - Modelli pronti!')
     setHasVisited(true)
   }
 
@@ -25,11 +26,10 @@ const WelcomeModal = () => {
 
   return (
     <div className='welcome-modal fixed inset-0 flex items-center justify-between bg-black bg-opacity-50 backdrop-blur-sm cursor-default z-[9999]'>
-      {/* Contenuto */}
       <div className='modal-content'>
         <h1 className='modal-title flex flex-col text-4xl lg:text-7xl'>
           <span>Hello there!</span>
-          <span className=''>Welcome to my island.</span>
+          <span>Welcome to my island.</span>
         </h1>
         <p className='flex flex-col text-2xl lg:text-3xl'>
           <span>I'm Stefania, a Frontend Developer from space.</span>
@@ -39,10 +39,9 @@ const WelcomeModal = () => {
           Discover my story, my skills and my projects...Drag the cursor and take flight.
         </p>
 
-        {/* Button con progress integrato */}
         <button
           onClick={handleClose}
-          disabled={!isLoaded}
+          disabled={!canClose}
           className={`
             modal-button 
             relative 
@@ -57,7 +56,7 @@ const WelcomeModal = () => {
             transition-all 
             duration-300
             text-nowrap
-            ${isLoaded ? 'cursor-pointer hover:border-blue-400 hover:scale-[1.02]' : 'cursor-not-allowed opacity-90'}
+            ${canClose ? 'cursor-pointer hover:border-blue-400 hover:scale-[1.02]' : 'cursor-not-allowed opacity-90'}
           `}
           style={{
             background: `linear-gradient(90deg, 
@@ -66,22 +65,26 @@ const WelcomeModal = () => {
             )`,
           }}>
           <span className='relative z-10 flex items-center justify-center h-full font-semibold'>
-            {isLoaded ? (
+            {canClose ? (
               <>
                 <span className='mr-2 animate-pulse'>✨</span>
                 Go to the island
               </>
+            ) : loadingProgress >= 80 ? (
+              <>
+                <span className='mr-2'>🎨</span>
+                Rendering scene... {Math.round(loadingProgress)}%
+              </>
             ) : (
               <>
                 <span className='mr-2'>⏳</span>
-                Loading... {Math.round(loadingProgress)}%
+                Loading models... {Math.round(loadingProgress)}%
               </>
             )}
           </span>
         </button>
 
-        {/* Progress details (optional debug info)*/}
-        {!isLoaded && <Loader />}
+        {!canClose && <Loader />}
       </div>
     </div>
   )

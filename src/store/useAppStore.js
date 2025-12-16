@@ -11,13 +11,26 @@ const useAppStore = create(
 
       // Stato principale della scena
       isSceneReady: false,
-      setSceneReady: (value) => set({ isSceneReady: value }),
+      setSceneReady: (value) => {
+        console.log('[Store] isSceneReady:', value)
+        set({ isSceneReady: value })
+      },
 
-      // Asset critici (se vuoi usarli)
+      // Asset critici
       criticalAssetsLoaded: false,
-      setCriticalAssetsLoaded: (value) => set({ criticalAssetsLoaded: value }),
+      setCriticalAssetsLoaded: (value) => {
+        console.log('[Store] criticalAssetsLoaded:', value)
+        set({ criticalAssetsLoaded: value })
+      },
 
-      // Stages dell’isola
+      // NUOVO: I modelli sono effettivamente renderizzati e visibili
+      modelsRendered: false,
+      setModelsRendered: (value) => {
+        console.log('[Store] modelsRendered:', value)
+        set({ modelsRendered: value })
+      },
+
+      // Stages dell'isola
       currentStage: 2,
       setCurrentStage: (stage) => set({ currentStage: stage }),
 
@@ -32,20 +45,24 @@ const useAppStore = create(
       },
       resetInteraction: () => set({ hasInteracted: false }),
 
-      // PROGRESS REALE DI CARICAMENTO
+      // Progress di caricamento
       loadingProgress: 0,
-      setLoadingProgress: (progress) => set({ loadingProgress: progress }),
+      setLoadingProgress: (progress) => {
+        console.log('[Store] loadingProgress:', progress)
+        set({ loadingProgress: progress })
+      },
 
       // Extra info del modello flamingo
       flamingoInfo: null,
       setFlamingoInfo: (info) => set({ flamingoInfo: info }),
 
-      // Reset completo della sessione (modal + scena)
+      // Reset completo della sessione
       reset: () =>
         set({
           hasVisited: false,
           isSceneReady: false,
           criticalAssetsLoaded: false,
+          modelsRendered: false,
           currentStage: 1,
           isInteracting: false,
           hasInteracted: false,
@@ -56,7 +73,6 @@ const useAppStore = create(
     {
       name: 'app-storage',
       storage: createJSONStorage(() => sessionStorage),
-      // Non persistiamo nulla (sessione effimera)
       partialize: () => ({}),
     }
   )
