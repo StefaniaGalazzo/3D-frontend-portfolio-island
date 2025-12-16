@@ -1,4 +1,3 @@
-// src/components/WelcomeModal.jsx
 import React from 'react'
 import useAppStore from '../store/useAppStore'
 import Loader from './Loader'
