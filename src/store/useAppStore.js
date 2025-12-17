@@ -1,4 +1,3 @@
-// src/store/useAppStore.js
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -9,14 +8,7 @@ const useAppStore = create(
       hasVisited: false,
       setHasVisited: (value) => set({ hasVisited: value }),
 
-      // Stato principale della scena
-      isSceneReady: false,
-      setSceneReady: (value) => {
-        console.log('[Store] isSceneReady:', value)
-        set({ isSceneReady: value })
-      },
-
-      // Asset critici
+      // Asset critici caricati (Flamingo + Island)
       criticalAssetsLoaded: false,
       setCriticalAssetsLoaded: (value) => {
         console.log('[Store] criticalAssetsLoaded:', value)
@@ -67,7 +59,6 @@ const useAppStore = create(
       reset: () =>
         set({
           hasVisited: false,
-          isSceneReady: false,
           criticalAssetsLoaded: false,
           modelsRendered: false,
           postProcessingReady: false,

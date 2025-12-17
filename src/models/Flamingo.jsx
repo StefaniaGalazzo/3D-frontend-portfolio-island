@@ -1,10 +1,10 @@
-// src/models/Flamingo.jsx
 import React, { useEffect, useRef, useCallback, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
-import flamingoModel from '../assets/3d/flamingo.glb'
 import { getAllIslands, findNearestIsland } from '../constants/islandConfig'
+
+const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
 
 function normalizeAngle(a) {
   while (a > Math.PI) a -= Math.PI * 2
@@ -15,7 +15,7 @@ function normalizeAngle(a) {
 const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionUpdate }) => {
   const rootRef = useRef(null)
   const { camera, controls } = useThree()
-  const { nodes, materials, animations } = useGLTF(flamingoModel)
+  const { nodes, materials, animations } = useGLTF(FLAMINGO_PATH)
   const { actions } = useAnimations(animations, rootRef)
 
   const state = useRef({
@@ -139,26 +139,24 @@ const Flamingo = React.memo(({ rotSpeedFactor = 1.0, onIslandChange, onPositionU
       }
     }
 
-    // Trova isola più vicina
     const currentPos = new THREE.Vector3(cur.x, cur.y, cur.z)
     const nearestIsland = findNearestIsland(currentPos)
 
     if (nearestIsland && nearestIsland.id !== s.currentIslandId) {
       s.currentIslandId = nearestIsland.id
-      s.currentStage = nearestIsland.stage  // ← AGGIUNTO
+      s.currentStage = nearestIsland.stage
       
       if (onIslandChange) {
         onIslandChange(nearestIsland.stage)
       }
     }
 
-    // Notifica posizione con currentStage
     if (onPositionUpdate) {
       const posCopy = new THREE.Vector3(cur.x, cur.y, cur.z)
       onPositionUpdate({ 
         position: posCopy, 
         azimuth,
-        currentStage: s.currentStage || nearestIsland?.stage || 1  // ← AGGIUNTO
+        currentStage: s.currentStage || nearestIsland?.stage || 1
       })
     }
   })

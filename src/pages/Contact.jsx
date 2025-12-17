@@ -1,14 +1,15 @@
 import emailjs from '@emailjs/browser'
 import { Canvas } from '@react-three/fiber'
-import { Suspense, useRef, useState, useEffect, useMemo } from 'react'
-import { useGLTF, useAnimations, Clone } from '@react-three/drei'
+import { Suspense, useRef, useState, useEffect } from 'react'
+import { useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
-import flamingoModel from '../assets/3d/flamingo.glb'
 import useAlert from '../hooks/useAlert'
 import { Alert, Loader } from '../components'
 
-// Preload del modello
-useGLTF.preload(flamingoModel)
+const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
+
+// Preload del modello PRIMA di tutto
+useGLTF.preload(FLAMINGO_PATH)
 
 const sanitize = (value) => {
   return value
@@ -19,16 +20,46 @@ const sanitize = (value) => {
 
 const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
   const group = useRef()
-  const { scene, animations } = useGLTF(flamingoModel)
-  const { actions } = useAnimations(animations, group)
+  const [model, setModel] = useState(null)
   const [position, setPosition] = useState([0.5, 0.35, 0])
   const [rotation, setRotation] = useState([12.629, -0.6, 0])
   const flyingAwayRef = useRef(false)
   const floatTime = useRef(0)
 
-  // Guard: verifica che il modello sia caricato
-  if (!scene) {
-    console.warn('[ContactFlamingo] Scene not loaded')
+  // Load model con retry logic
+  useEffect(() => {
+    let mounted = true
+
+    const loadModel = async () => {
+      try {
+        const gltf = await useGLTF.preload(FLAMINGO_PATH)
+
+        if (!mounted) return
+
+        // Verifica che gltf.scene esista e sia valido
+        if (gltf?.scene && gltf.scene.type) {
+          // Clone profondo per evitare conflitti
+          const clonedScene = gltf.scene.clone(true)
+          setModel({ scene: clonedScene, animations: gltf.animations })
+        } else {
+          console.error('[ContactFlamingo] Invalid GLTF scene')
+        }
+      } catch (error) {
+        console.error('[ContactFlamingo] Load error:', error)
+      }
+    }
+
+    loadModel()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const { actions } = useAnimations(model?.animations || [], group)
+
+  // Guard: non renderizzare finché model non è pronto
+  if (!model?.scene) {
     return null
   }
 
@@ -92,13 +123,13 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
 
   return (
     <group ref={group} position={position} rotation={rotation} scale={[0.9, 0.9, 0.9]}>
-      <Clone object={scene} scale={0.025} />
+      <primitive object={model.scene} scale={0.025} />
     </group>
   )
 }
 
 const Contact = () => {
-  const formRef = useRef()
+  // const formRef = useRef()
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState({})
   const { alert, showAlert, hideAlert } = useAlert()

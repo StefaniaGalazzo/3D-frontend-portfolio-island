@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 
 /**
- * useCameraInitializer(controlsRef, ready, initialPosition, target)
- * - esegue l'inizializzazione solo quando ready === true
+ * Inizializza camera position e target SOLO quando controls è pronto.
+ * Elimina il delay artificiale - i controls sono pronti appena montati.
  */
 const useCameraInitializer = (
   controlsRef,
@@ -11,19 +11,10 @@ const useCameraInitializer = (
   target = { x: 0, y: 0, z: 0 }
 ) => {
   useEffect(() => {
-    if (!ready) {
-      // console.warn('[CameraInitializer] controls not ready yet')
-      return
-    }
-    if (!controlsRef?.current) {
-      console.warn('[CameraInitializer] controlsRef.current is falsy despite ready=true')
-      return
-    }
+    if (!ready || !controlsRef?.current) return
 
-    console.log('[CameraInitializer] Initializing camera (controls ready)')
     const controls = controlsRef.current
 
-    // protezioni: assicurati che object e target esistano
     if (controls.object && typeof controls.target?.set === 'function') {
       controls.object.position.set(initialPosition.x, initialPosition.y, initialPosition.z)
       controls.target.set(target.x, target.y, target.z)

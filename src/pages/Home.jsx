@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React from 'react'
 import { HomeInfo, WelcomeModal, DragCursor, Scene3D } from '../components'
 import useAppStore from '../store/useAppStore'
@@ -9,7 +8,7 @@ export default function Home() {
   usePreloadAssets()
 
   const hasVisited = useAppStore((state) => state.hasVisited)
-  const isSceneReady = useAppStore((state) => state.isSceneReady)
+  const criticalAssetsLoaded = useAppStore((state) => state.criticalAssetsLoaded)
   const currentStage = useAppStore((state) => state.currentStage)
 
   return (
@@ -20,8 +19,8 @@ export default function Home() {
       {/* Custom Drag Cursor - Visible solo dopo chiusura modale */}
       {hasVisited && <DragCursor />}
 
-      {/* Home Info - Mostra stage corrente quando scena è pronta */}
-      {hasVisited && isSceneReady && (
+      {/* Home Info - Mostra stage corrente quando assets pronti */}
+      {hasVisited && criticalAssetsLoaded && (
         <div className='absolute top-24 left-0 right-0 z-50 flex items-center justify-center'>
           <HomeInfo currentStage={currentStage} />
         </div>

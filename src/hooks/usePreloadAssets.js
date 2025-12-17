@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import useAppStore from '../store/useAppStore'
-import flamingoModel from '../assets/3d/flamingo.glb'
-import islandModel from '../assets/3d/island.glb'
+
+// Usa BASE_URL per supportare GitHub Pages
+const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
+const ISLAND_PATH = `${import.meta.env.BASE_URL}island-compressed.glb`
 
 const usePreloadAssets = () => {
   const setLoadingProgress = useAppStore((s) => s.setLoadingProgress)
-  const setSceneReady = useAppStore((s) => s.setSceneReady)
   const setCriticalAssetsLoaded = useAppStore((s) => s.setCriticalAssetsLoaded)
   const hasPreloaded = useRef(false)
 
@@ -14,52 +15,42 @@ const usePreloadAssets = () => {
     if (hasPreloaded.current) {
       setLoadingProgress(100)
       setCriticalAssetsLoaded(true)
-      setSceneReady(true)
       return
     }
 
-    let isCancelled = false
+    let cancelled = false
 
-    const loadAssets = async () => {
+    const preload = async () => {
       try {
-        console.log('[Preload] Inizio caricamento...')
-        setLoadingProgress(5)
-        
-        // Carica Flamingo
-        await useGLTF.preload(flamingoModel)
-        if (isCancelled) return
-        
-        console.log('[Preload] Flamingo loaded')
-        setLoadingProgress(40)
-        setCriticalAssetsLoaded(true)
+        setLoadingProgress(10)
 
-        // Carica Island
-        await useGLTF.preload(islandModel)
-        if (isCancelled) return
-        
-        console.log('[Preload] Island loaded')
-        setLoadingProgress(80)
-        setSceneReady(true)
-        
+        // Preload entrambi i modelli in parallelo
+        await Promise.all([
+          useGLTF.preload(FLAMINGO_PATH),
+          useGLTF.preload(ISLAND_PATH)
+        ])
+
+        if (cancelled) return
+
         hasPreloaded.current = true
-        console.log('[Preload] Preload completo - modelli in memoria')
+        setLoadingProgress(100)
+        setCriticalAssetsLoaded(true)
+        console.log('[Preload] Assets cached and ready')
       } catch (error) {
-        console.error('[Preload] Errore:', error)
-        if (!isCancelled) {
-          setLoadingProgress(80)
+        console.error('[Preload] Error:', error)
+        if (!cancelled) {
           setCriticalAssetsLoaded(true)
-          setSceneReady(true)
           hasPreloaded.current = true
         }
       }
     }
 
-    loadAssets()
+    preload()
 
     return () => {
-      isCancelled = true
+      cancelled = true
     }
-  }, [setLoadingProgress, setSceneReady, setCriticalAssetsLoaded])
+  }, [setLoadingProgress, setCriticalAssetsLoaded])
 }
 
 export default usePreloadAssets
