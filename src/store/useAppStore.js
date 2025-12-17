@@ -23,11 +23,11 @@ const useAppStore = create(
       },
 
       // PostProcessing pronto (lazy load)
-      postProcessingReady: false,
-      setPostProcessingReady: (value) => {
-        console.log('[Store] postProcessingReady:', value)
-        set({ postProcessingReady: value })
-      },
+      // postProcessingReady: false,
+      // setPostProcessingReady: (value) => {
+      //   console.log('[Store] postProcessingReady:', value)
+      //   set({ postProcessingReady: value })
+      // },
 
       // Stages dell'isola
       currentStage: 2,

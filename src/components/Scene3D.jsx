@@ -48,15 +48,15 @@ const Scene3D = () => {
     {
       // Directional Light
       dirPosition: { value: [8, 3, 5], step: 0.5, label: 'Dir Position' },
-      dirIntensity: { value: 4, min: 0, max: 5, step: 0.5, label: 'Dir Intensity' },
+      dirIntensity: { value: 5, min: 0, max: 5, step: 0.5, label: 'Dir Intensity' },
       dirColor: { value: '#243ef0', label: 'Dir Color' },
 
       // Ambient Light
-      ambIntensity: { value: 0.3, min: 0, max: 3, step: 0.1, label: 'Amb Intensity' },
+      ambIntensity: { value: 0.15, min: 0, max: 3, step: 0.1, label: 'Amb Intensity' },
       ambColor: { value: '#959ded', label: 'Amb Color' },
 
       // Hemisphere Light
-      hemiIntensity: { value: 0.5, min: 0, max: 2, step: 0.1, label: 'Hemi Intensity' },
+      hemiIntensity: { value: 1.1, min: 0, max: 2, step: 0.1, label: 'Hemi Intensity' },
       hemiSkyColor: { value: '#3b54ff', label: 'Hemi Sky' },
       hemiGroundColor: { value: '#06022d', label: 'Hemi Ground' },
     },
@@ -169,7 +169,7 @@ const Scene3D = () => {
 
   return (
     <>
-      <Leva collapsed hidden />
+      <Leva collapsed />
       <Canvas
         className='w-full h-screen inset-0 z-0'
         camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}
