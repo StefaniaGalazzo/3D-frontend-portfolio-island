@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import useAppStore from '../store/useAppStore'
 
-// Usa BASE_URL per supportare GitHub Pages
 const ISLAND_PATH = `${import.meta.env.BASE_URL}island-compressed.glb`
 const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
 
@@ -12,6 +11,7 @@ const usePreloadAssets = () => {
   const hasPreloaded = useRef(false)
 
   useEffect(() => {
+    // Cache hit: instant return
     if (hasPreloaded.current) {
       setLoadingProgress(100)
       setCriticalAssetsLoaded(true)
@@ -24,8 +24,8 @@ const usePreloadAssets = () => {
       try {
         setLoadingProgress(10)
 
-        // Preload entrambi i modelli in parallelo
-        await Promise.all([useGLTF.preload(ISLAND_PATH), useGLTF.preload(FLAMINGO_PATH)])
+        // Preload in parallelo (SINGOLO FETCH per file)
+        await Promise.all([useGLTF.preload(FLAMINGO_PATH), useGLTF.preload(ISLAND_PATH)])
 
         if (cancelled) return
 
@@ -38,6 +38,7 @@ const usePreloadAssets = () => {
         if (!cancelled) {
           setCriticalAssetsLoaded(true)
           hasPreloaded.current = true
+          setLoadingProgress(100)
         }
       }
     }

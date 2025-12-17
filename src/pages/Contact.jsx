@@ -8,7 +8,6 @@ import { Alert, Loader } from '../components'
 
 const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
 
-// Preload del modello PRIMA di tutto
 useGLTF.preload(FLAMINGO_PATH)
 
 const sanitize = (value) => {
@@ -20,49 +19,26 @@ const sanitize = (value) => {
 
 const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
   const group = useRef()
-  const [model, setModel] = useState(null)
+
+  const { scene, animations } = useGLTF(FLAMINGO_PATH)
+  const { actions } = useAnimations(animations, group)
+
   const [position, setPosition] = useState([0.5, 0.35, 0])
   const [rotation, setRotation] = useState([12.629, -0.6, 0])
   const flyingAwayRef = useRef(false)
   const floatTime = useRef(0)
 
-  // Load model con retry logic
+  // Clone scene per evitare conflitti con Home Flamingo
+  const clonedScene = useRef()
+
   useEffect(() => {
-    let mounted = true
-
-    const loadModel = async () => {
-      try {
-        const gltf = await useGLTF.preload(FLAMINGO_PATH)
-
-        if (!mounted) return
-
-        // Verifica che gltf.scene esista e sia valido
-        if (gltf?.scene && gltf.scene.type) {
-          // Clone profondo per evitare conflitti
-          const clonedScene = gltf.scene.clone(true)
-          setModel({ scene: clonedScene, animations: gltf.animations })
-        } else {
-          console.error('[ContactFlamingo] Invalid GLTF scene')
-        }
-      } catch (error) {
-        console.error('[ContactFlamingo] Load error:', error)
-      }
+    if (scene && !clonedScene.current) {
+      clonedScene.current = scene.clone(true)
+      console.log('[ContactFlamingo] Scene cloned successfully')
     }
+  }, [scene])
 
-    loadModel()
-
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  const { actions } = useAnimations(model?.animations || [], group)
-
-  // Guard: non renderizzare finché model non è pronto
-  if (!model?.scene) {
-    return null
-  }
-
+  // Animazione fly
   useEffect(() => {
     const flyAction = actions?.['flamingo_flyA_'] || Object.values(actions || {})[0]
     if (!flyAction) return
@@ -79,6 +55,7 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [actions, isFlying])
 
+  // Animazione fly away
   useEffect(() => {
     if (isFlyingAway && !flyingAwayRef.current) {
       flyingAwayRef.current = true
@@ -108,11 +85,12 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [isFlyingAway, onFlyAwayComplete])
 
+  // Animazione float (idle)
   useEffect(() => {
     if (!isFlying && !isFlyingAway) {
       const animate = () => {
         if (!isFlying && !isFlyingAway && !flyingAwayRef.current) {
-          floatTime.current += 0.016
+          floatTime.current += 0.01
           setPosition((prev) => [prev[0], 0.35 + Math.sin(floatTime.current) * 0.15, prev[2]])
           requestAnimationFrame(animate)
         }
@@ -121,15 +99,19 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     }
   }, [isFlying, isFlyingAway])
 
+  // Guard: aspetta clone
+  if (!clonedScene.current) {
+    return null
+  }
+
   return (
     <group ref={group} position={position} rotation={rotation} scale={[0.9, 0.9, 0.9]}>
-      <primitive object={model.scene} scale={0.025} />
+      <primitive object={clonedScene.current} scale={0.025} />
     </group>
   )
 }
 
 const Contact = () => {
-  // const formRef = useRef()
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState({})
   const { alert, showAlert, hideAlert } = useAlert()
@@ -144,11 +126,7 @@ const Contact = () => {
 
   const handleFocus = () => setIsFlying(true)
   const handleBlur = () => setIsFlying(false)
-  // console.log(
-  //   ' import.meta.env.VITE_APP_EMAILJS_SERVICE_ID; import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID:',
-  //   import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
-  //   import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID
-  // )
+
   const validateForm = () => {
     const newErrors = {}
 
