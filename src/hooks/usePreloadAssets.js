@@ -3,8 +3,8 @@ import { useGLTF } from '@react-three/drei'
 import useAppStore from '../store/useAppStore'
 
 // Usa BASE_URL per supportare GitHub Pages
-const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
 const ISLAND_PATH = `${import.meta.env.BASE_URL}island-compressed.glb`
+const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
 
 const usePreloadAssets = () => {
   const setLoadingProgress = useAppStore((s) => s.setLoadingProgress)
@@ -25,10 +25,7 @@ const usePreloadAssets = () => {
         setLoadingProgress(10)
 
         // Preload entrambi i modelli in parallelo
-        await Promise.all([
-          useGLTF.preload(FLAMINGO_PATH),
-          useGLTF.preload(ISLAND_PATH)
-        ])
+        await Promise.all([useGLTF.preload(ISLAND_PATH), useGLTF.preload(FLAMINGO_PATH)])
 
         if (cancelled) return
 
