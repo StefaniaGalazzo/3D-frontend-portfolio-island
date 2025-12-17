@@ -222,7 +222,7 @@ const Scene3D = () => {
 
   return (
     <>
-      <Leva collapsed={false} />
+      <Leva collapsed={false} hidden />
       <Canvas
         className='w-full h-screen inset-0 z-0'
         camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}

@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { appRoutes } from './routes'
 import AppLayout from './components/layouts/AppLayout'
+import NotFound from './pages/NotFound'
 
 const App = () => {
   return (
@@ -11,8 +12,8 @@ const App = () => {
             <Route key={path} path={path} element={element} />
           ))}
 
-          {/* 404 Redirect to Home */}
-          <Route path='*' element={<Navigate to='/' replace />} />
+          {/* 404 - Custom page invece di redirect */}
+          <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>
