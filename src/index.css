@@ -164,7 +164,7 @@ header,
   margin: auto;
   padding: 5.5rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  background: #042283ab;
+  background: #042283d5;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   /* opacity: 0.8; */
@@ -271,7 +271,7 @@ header,
 @media (max-width: 640px) {
   .welcome-modal {
     padding: 2rem;
-    max-width: 90%;
+    /* max-width: 100%; */
   }
 
   .modal-button {
