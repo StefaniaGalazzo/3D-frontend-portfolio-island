@@ -84,7 +84,7 @@ export const getQualityConfig = () => {
   if (tablet) {
     return {
       modelQuality: 'medium',
-      textureSize: 425,
+      textureSize: 320,
       shadows: true,
       postProcessing: false,
       pixelRatio: Math.min(window.devicePixelRatio, 2),
@@ -94,7 +94,7 @@ export const getQualityConfig = () => {
 
   return {
     modelQuality: 'high',
-    textureSize: 425,
+    textureSize: 320,
     // textureSize: 2048,
     shadows: true,
     postProcessing: false,
