@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import useAppStore from '../store/useAppStore'
+import { ProgressiveGLBLoader } from '../utils/progressiveLoader'
 
 const ISLAND_PATH = `${import.meta.env.BASE_URL}island-compressed.glb`
 const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
@@ -20,11 +21,33 @@ const usePreloadAssets = () => {
 
     let cancelled = false
 
-    const preload = async () => {
+    const preloadWithProgress = async () => {
       try {
-        setLoadingProgress(10)
+        setLoadingProgress(5)
 
-        // Preload in parallelo (SINGOLO FETCH per file)
+        // 1. Flamingo (piccolo, veloce) - SENZA progress
+        const flamingoLoader = new ProgressiveGLBLoader()
+        await flamingoLoader.load(FLAMINGO_PATH)
+        
+        if (cancelled) return
+        setLoadingProgress(20)
+
+        // 2. Island (pesante) - CON progress tracking
+        const islandLoader = new ProgressiveGLBLoader((info) => {
+          if (!cancelled) {
+            // Map 0-100% Island → 20-90% totale
+            const progressMapped = 20 + (info.percentage * 0.7)
+            setLoadingProgress(Math.round(progressMapped))
+          }
+        })
+
+        await islandLoader.load(ISLAND_PATH)
+        
+        if (cancelled) return
+        setLoadingProgress(95)
+
+        // 3. Popola cache drei per componenti Island/Flamingo
+        // Questi useranno browser cache, NO doppio download
         await Promise.all([
           useGLTF.preload(FLAMINGO_PATH),
           useGLTF.preload(ISLAND_PATH)
@@ -35,10 +58,20 @@ const usePreloadAssets = () => {
         hasPreloaded.current = true
         setLoadingProgress(100)
         setCriticalAssetsLoaded(true)
-        console.log('[Preload] Assets cached and ready')
+        console.log('[Preload] Assets cached with real progress')
       } catch (error) {
         console.error('[Preload] Error:', error)
         if (!cancelled) {
+          // Fallback: prova preload standard
+          try {
+            await Promise.all([
+              useGLTF.preload(FLAMINGO_PATH),
+              useGLTF.preload(ISLAND_PATH)
+            ])
+          } catch (fallbackError) {
+            console.error('[Preload] Fallback also failed:', fallbackError)
+          }
+          
           setCriticalAssetsLoaded(true)
           hasPreloaded.current = true
           setLoadingProgress(100)
@@ -46,7 +79,7 @@ const usePreloadAssets = () => {
       }
     }
 
-    preload()
+    preloadWithProgress()
 
     return () => {
       cancelled = true
