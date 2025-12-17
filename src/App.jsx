@@ -4,7 +4,7 @@ import AppLayout from './components/layouts/AppLayout'
 
 const App = () => {
   return (
-    <BrowserRouter basename='/3D-frontend-portfolio-island'>
+    <BrowserRouter basename='/'>
       <Routes>
         <Route element={<AppLayout />}>
           {appRoutes.map(({ path, element }) => (

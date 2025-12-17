@@ -1,8 +1,8 @@
 // Service Worker per caching aggressivo GLB files
 const CACHE_NAME = 'glb-cache-v1'
 const GLB_FILES = [
-  '/3D-frontend-portfolio-island/flamingo.glb',
-  '/3D-frontend-portfolio-island/island-compressed.glb'
+  '/flamingo.glb',
+  '/island-compressed.glb'
 ]
 
 self.addEventListener('install', (event) => {

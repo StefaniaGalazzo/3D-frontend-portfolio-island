@@ -39,21 +39,27 @@ export default defineConfig({
             console.log(`[Compress] ${file}:`)
             console.log(`  Original: ${(content.length / 1024).toFixed(2)} KB`)
             console.log(
-              `  Gzip:     ${(gzipped.length / 1024).toFixed(2)} KB (${((1 - gzipped.length / content.length) * 100).toFixed(1)}% reduction)`
+              `  Gzip:     ${(gzipped.length / 1024).toFixed(2)} KB (${(
+                (1 - gzipped.length / content.length) *
+                100
+              ).toFixed(1)}% reduction)`
             )
             console.log(
-              `  Brotli:   ${(brotlied.length / 1024).toFixed(2)} KB (${((1 - brotlied.length / content.length) * 100).toFixed(1)}% reduction)`
+              `  Brotli:   ${(brotlied.length / 1024).toFixed(2)} KB (${(
+                (1 - brotlied.length / content.length) *
+                100
+              ).toFixed(1)}% reduction)`
             )
           }
         })
       },
     },
   ],
-  
-  // IMPORTANTE: Per Cloudflare Pages usa '/' (root)
+
+  // Per Cloudflare Pages usa '/' (root)
   // Per GitHub Pages usa '/3D-frontend-portfolio-island/'
   base: '/',
-  
+
   assetsInclude: ['**/*.glb'],
 
   build: {
