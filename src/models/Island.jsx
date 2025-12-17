@@ -3,6 +3,8 @@ import { useGLTF, useAnimations } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import useAppStore from '../store/useAppStore'
+import { optimizeGLTFMaterials, getOptimalTextureSettings } from '../utils/gltfOptimizer'
+import { logDeviceInfo } from '../utils/deviceDetection'
 
 const ISLAND_PATH = `${import.meta.env.BASE_URL}island-compressed.glb`
 
@@ -13,9 +15,26 @@ export function Island({ position, rotation, scale, ...props }) {
   const setModelsRendered = useAppStore((s) => s.setModelsRendered)
   const setPostProcessingReady = useAppStore((s) => s.setPostProcessingReady)
   const hasRendered = useRef(false)
+  const hasOptimized = useRef(false)
 
   const basePosition = useRef(position)
   const baseRotation = useRef(rotation)
+
+  // Ottimizza materiali e texture al primo caricamento
+  useEffect(() => {
+    if (hasOptimized.current || !gltf.scene) return
+
+    const deviceInfo = logDeviceInfo()
+    const isMobile = deviceInfo.modelQuality === 'low'
+    const isLowEnd = !deviceInfo.postProcessing
+
+    const textureSettings = getOptimalTextureSettings(isMobile, isLowEnd)
+    
+    console.log('[Island] Optimizing materials...', textureSettings)
+    optimizeGLTFMaterials(gltf, textureSettings)
+    
+    hasOptimized.current = true
+  }, [gltf])
 
   // Animazione GLTF
   useEffect(() => {

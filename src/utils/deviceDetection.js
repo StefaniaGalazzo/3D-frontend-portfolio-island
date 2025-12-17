@@ -86,7 +86,7 @@ export const getQualityConfig = () => {
       modelQuality: 'medium',
       textureSize: 425,
       shadows: true,
-      postProcessing: true,
+      postProcessing: false,
       pixelRatio: Math.min(window.devicePixelRatio, 2),
       antialias: true,
     }
@@ -97,7 +97,7 @@ export const getQualityConfig = () => {
     textureSize: 425,
     // textureSize: 2048,
     shadows: true,
-    postProcessing: true,
+    postProcessing: false,
     pixelRatio: Math.min(window.devicePixelRatio, 2),
     antialias: true,
   }
