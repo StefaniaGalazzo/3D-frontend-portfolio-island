@@ -43,6 +43,26 @@ const Scene3D = () => {
     { collapsed: true }
   )
 
+  const lightControls = useControls(
+    'Lights',
+    {
+      // Directional Light
+      dirPosition: { value: [8, 3, 5], step: 0.5, label: 'Dir Position' },
+      dirIntensity: { value: 4, min: 0, max: 5, step: 0.5, label: 'Dir Intensity' },
+      dirColor: { value: '#243ef0', label: 'Dir Color' },
+
+      // Ambient Light
+      ambIntensity: { value: 0.3, min: 0, max: 3, step: 0.1, label: 'Amb Intensity' },
+      ambColor: { value: '#959ded', label: 'Amb Color' },
+
+      // Hemisphere Light
+      hemiIntensity: { value: 0.5, min: 0, max: 2, step: 0.1, label: 'Hemi Intensity' },
+      hemiSkyColor: { value: '#3b54ff', label: 'Hemi Sky' },
+      hemiGroundColor: { value: '#06022d', label: 'Hemi Ground' },
+    },
+    { collapsed: true }
+  )
+
   const islands = useMemo(() => getAllIslands(), [])
 
   const handleIslandChange = useCallback(
@@ -79,12 +99,29 @@ const Scene3D = () => {
   const lights = useMemo(
     () => (
       <>
-        <directionalLight position={[8, 6, 5]} intensity={1.3} color='#e89067ff' />
-        <ambientLight intensity={1} color='#c04612ff' />
-        <hemisphereLight skyColor='#f3ac88ff' groundColor='#6c2f17ff' intensity={0.5} />
+        <directionalLight
+          position={lightControls.dirPosition}
+          intensity={lightControls.dirIntensity}
+          color={lightControls.dirColor}
+        />
+        <ambientLight intensity={lightControls.ambIntensity} color={lightControls.ambColor} />
+        <hemisphereLight
+          skyColor={lightControls.hemiSkyColor}
+          groundColor={lightControls.hemiGroundColor}
+          intensity={lightControls.hemiIntensity}
+        />
       </>
     ),
-    []
+    [
+      lightControls.dirPosition,
+      lightControls.dirIntensity,
+      lightControls.dirColor,
+      lightControls.ambIntensity,
+      lightControls.ambColor,
+      lightControls.hemiIntensity,
+      lightControls.hemiSkyColor,
+      lightControls.hemiGroundColor,
+    ]
   )
 
   const plumbobs = useMemo(
@@ -132,7 +169,7 @@ const Scene3D = () => {
 
   return (
     <>
-      <Leva collapsed hidden />
+      <Leva collapsed />
       <Canvas
         className='w-full h-screen inset-0 z-0'
         camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}

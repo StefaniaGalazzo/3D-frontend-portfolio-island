@@ -72,7 +72,13 @@ requestAnimationFrame(() => {
 - PostProcessing si attiva ~32ms dopo rendering invece di 1000ms
 - Mantiene stabilità visiva (2 frames di buffer)
 
-### 4. **PATH STANDARDIZZATI**
+### 4. **PATH STANDARDIZZATI CON BASE_URL**
+```js
+// Supporta sia dev locale che GitHub Pages deployment
+const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
+const ISLAND_PATH = `${import.meta.env.BASE_URL}island-compressed.glb`
+```
+
 ```
 public/
 ├── flamingo.glb
@@ -81,8 +87,10 @@ public/
 
 **Benefici:**
 - Vite serve direttamente da `/public` senza processing
+- `import.meta.env.BASE_URL` gestisce automaticamente `/3D-frontend-portfolio-island/` per GitHub Pages
 - Browser cache funziona correttamente
-- Path consistenti `/flamingo.glb` ovunque
+- Dev locale: `/flamingo.glb`
+- Production: `/3D-frontend-portfolio-island/flamingo.glb`
 
 ### 5. **STORE SEMPLIFICATO**
 ```js

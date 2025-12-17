@@ -42,7 +42,7 @@ const WelcomeModal = () => {
             relative 
             w-full 
             h-12
-            mt-8
+            mt-5
             overflow-hidden 
             rounded-lg
             border-2
@@ -50,20 +50,17 @@ const WelcomeModal = () => {
             text-center 
             transition-all 
             duration-300
+            cursor-not-allowed
             text-nowrap
-            ${canClose ? 'cursor-pointer hover:border-blue-400 hover:scale-[1.02]' : 'cursor-not-allowed opacity-90'}
-          `}
-          style={{
-            background: `linear-gradient(90deg, 
-              rgba(97, 56, 231, 1) ${loadingProgress}%, 
-              rgba(30, 41, 59, 0.3) ${loadingProgress}%
-            )`,
-          }}>
+            opacity-90
+            ${canClose && 'cursor-pointer hover:border-blue-400 hover:scale-[1.02]'}
+          `}>
           <span className='relative z-10 flex items-center justify-center h-full font-semibold'>
             {canClose ? (
               <>
                 <span className='mr-2 animate-pulse'>✨</span>
                 Go to the island
+                <span className='mr-2 animate-pulse'>✨</span>
               </>
             ) : loadingProgress >= 80 ? (
               <>

@@ -15,7 +15,7 @@ const STAGES = {
     linkLabel: 'Discover my skills',
   },
   3: {
-    text1: 'Corious? Take a look at my projects!',
+    text1: 'Curious? Take a look at my projects!',
     linkTo: '/projects',
     linkLabel: 'Projects',
   },

@@ -29,7 +29,7 @@ const Loader = ({ isComplete = false }) => {
   }, [isComplete])
 
   return (
-    <div className='grid center m-auto text-white w-full h-full top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center z-50 pointer-events-none'>
+    <div className='grid center m-auto text-white w-full h-full flex flex-col items-center justify-center z-50 pointer-events-none'>
       <p
         key={showReady ? 'ready' : index}
         className='

@@ -104,7 +104,7 @@ const PostProcessing = () => {
 
   return (
     <EffectComposer>
-      {duoToneEffect && <primitive object={duoToneEffect} />}
+      {/* {duoToneEffect && <primitive object={duoToneEffect} />} */}
       {/* Vignette Effect
       {duoToneControls.vignetteEnabled && (
         <Vignette offset={duoToneControls.vignetteOffset} darkness={duoToneControls.vignetteDarkness} />
