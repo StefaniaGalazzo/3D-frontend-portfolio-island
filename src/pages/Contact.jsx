@@ -90,7 +90,7 @@ const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
     if (!isFlying && !isFlyingAway) {
       const animate = () => {
         if (!isFlying && !isFlyingAway && !flyingAwayRef.current) {
-          floatTime.current += 0.016
+          floatTime.current += 0.01
           setPosition((prev) => [prev[0], 0.35 + Math.sin(floatTime.current) * 0.15, prev[2]])
           requestAnimationFrame(animate)
         }

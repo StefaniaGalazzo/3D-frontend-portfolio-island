@@ -1,7 +1,8 @@
 import React, { Suspense, useRef, useMemo, useCallback, useState, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
+import * as THREE from 'three'
 import { PostProcessing, PlumbobLabel } from '../components'
 import { Flamingo, Island, Plumbob } from '../models'
 import { getAllIslands } from '../constants/islandConfig'
@@ -10,6 +11,42 @@ import useSceneInteraction from '../hooks/useSceneInteraction'
 import useCameraInitializer from '../hooks/useCameraInitializer'
 import GradientBackground from './GradientBackground'
 import { logDeviceInfo } from '../utils/deviceDetection'
+
+// Helper component per visualizzare directional lights
+const LightHelpers = ({ lights, showHelpers }) => {
+  const { scene } = useThree()
+
+  useEffect(() => {
+    if (!showHelpers) return
+
+    const helpers = []
+
+    // Trova tutte le directional lights nella scena
+    scene.traverse((child) => {
+      if (child instanceof THREE.DirectionalLight) {
+        const helper = new THREE.DirectionalLightHelper(child, 5, child.color)
+        scene.add(helper)
+        helpers.push(helper)
+
+        // Aggiungi anche helper per il target (dove punta)
+        const targetHelper = new THREE.AxesHelper(2)
+        child.target.add(targetHelper)
+
+        console.log('[LightHelper] Added helper for light at:', child.position)
+      }
+    })
+
+    // Cleanup
+    return () => {
+      helpers.forEach((helper) => {
+        scene.remove(helper)
+        helper.dispose()
+      })
+    }
+  }, [scene, showHelpers, lights])
+
+  return null
+}
 
 const Scene3D = () => {
   const controlsRef = useRef(null)
@@ -46,10 +83,13 @@ const Scene3D = () => {
   const lightControls = useControls(
     'Lights',
     {
-      // Directional Light
-      dirPosition: { value: [8, 3, 5], step: 0.5, label: 'Dir Position' },
-      dirIntensity: { value: 5, min: 0, max: 5, step: 0.5, label: 'Dir Intensity' },
-      dirColor: { value: '#243ef0', label: 'Dir Color' },
+      // Debug
+      showHelpers: { value: false, label: '👁️ Show Helpers' },
+
+      // Directional Light 1
+      dirPosition: { value: [8, 3, 5], step: 0.5, label: 'Dir1 Position' },
+      dirIntensity: { value: 5, min: 0, max: 5, step: 0.5, label: 'Dir1 Intensity' },
+      dirColor: { value: '#243ef0', label: 'Dir1 Color' },
 
       // Ambient Light
       ambIntensity: { value: 0.15, min: 0, max: 3, step: 0.1, label: 'Amb Intensity' },
@@ -59,6 +99,11 @@ const Scene3D = () => {
       hemiIntensity: { value: 1.1, min: 0, max: 2, step: 0.1, label: 'Hemi Intensity' },
       hemiSkyColor: { value: '#3b54ff', label: 'Hemi Sky' },
       hemiGroundColor: { value: '#06022d', label: 'Hemi Ground' },
+
+      // Directional Light 2
+      dirPosition_2: { value: [-19, 8, -17], step: 0.5, label: 'Dir2 Position' },
+      dirIntensity_2: { value: 5, min: 0, max: 5, step: 0.5, label: 'Dir2 Intensity' },
+      dirColor_2: { value: '#243ef0', label: 'Dir2 Color' },
     },
     { collapsed: true }
   )
@@ -110,6 +155,11 @@ const Scene3D = () => {
           groundColor={lightControls.hemiGroundColor}
           intensity={lightControls.hemiIntensity}
         />
+        <directionalLight
+          position={lightControls.dirPosition_2}
+          intensity={lightControls.dirIntensity_2}
+          color={lightControls.dirColor_2}
+        />
       </>
     ),
     [
@@ -121,6 +171,9 @@ const Scene3D = () => {
       lightControls.hemiIntensity,
       lightControls.hemiSkyColor,
       lightControls.hemiGroundColor,
+      lightControls.dirPosition_2,
+      lightControls.dirIntensity_2,
+      lightControls.dirColor_2,
     ]
   )
 
@@ -169,7 +222,7 @@ const Scene3D = () => {
 
   return (
     <>
-      <Leva collapsed hidden />
+      <Leva collapsed={false} />
       <Canvas
         className='w-full h-screen inset-0 z-0'
         camera={{ position: [86, 0, -50], fov: 50, near: 0.1, far: 300 }}
@@ -185,6 +238,10 @@ const Scene3D = () => {
         <OrbitControls ref={orbitRefCallback} makeDefault {...orbitControlsProps} />
 
         {lights}
+
+        {/* Helper per visualizzare luci */}
+        <LightHelpers lights={lights} showHelpers={lightControls.showHelpers} />
+
         <Stars
           radius={70}
           depth={50}

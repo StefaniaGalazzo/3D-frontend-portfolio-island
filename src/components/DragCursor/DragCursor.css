@@ -5,8 +5,16 @@
   left: 0;
   pointer-events: none;
   z-index: 9999;
-  will-change: transform;
+  will-change: transform, opacity;
   cursor: none;
+  
+  /* ✅ Smooth fade transition */
+  opacity: 1;
+  transition: opacity 0.2s ease-out;
+}
+
+.drag-cursor.hiding {
+  opacity: 0;
 }
 
 .drag-cursor-circle {
