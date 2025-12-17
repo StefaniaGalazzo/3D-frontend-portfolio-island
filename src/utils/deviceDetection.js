@@ -62,7 +62,7 @@ export const getQualityConfig = () => {
   if (mobile && gpuTier === 'low') {
     return {
       modelQuality: 'low',
-      textureSize: 512,
+      textureSize: 320,
       shadows: false,
       postProcessing: false,
       pixelRatio: Math.min(window.devicePixelRatio, 2),
@@ -70,21 +70,21 @@ export const getQualityConfig = () => {
     }
   }
 
-  if (mobile && gpuTier !== 'low') {
-    return {
-      modelQuality: 'medium',
-      textureSize: 1024,
-      shadows: false,
-      postProcessing: false,
-      pixelRatio: Math.min(window.devicePixelRatio, 2),
-      antialias: true,
-    }
-  }
+  // if (mobile && gpuTier !== 'low') {
+  //   return {
+  //     modelQuality: 'medium',
+  //     textureSize: 1024,
+  //     shadows: false,
+  //     postProcessing: false,
+  //     pixelRatio: Math.min(window.devicePixelRatio, 2),
+  //     antialias: true,
+  //   }
+  // }
 
   if (tablet) {
     return {
       modelQuality: 'medium',
-      textureSize: 1024,
+      textureSize: 425,
       shadows: true,
       postProcessing: true,
       pixelRatio: Math.min(window.devicePixelRatio, 2),
@@ -94,7 +94,8 @@ export const getQualityConfig = () => {
 
   return {
     modelQuality: 'high',
-    textureSize: 2048,
+    textureSize: 425,
+    // textureSize: 2048,
     shadows: true,
     postProcessing: true,
     pixelRatio: Math.min(window.devicePixelRatio, 2),
