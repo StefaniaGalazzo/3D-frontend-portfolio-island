@@ -10,11 +10,9 @@ const FLAMINGO_PATH = `${import.meta.env.BASE_URL}flamingo.glb`
 
 useGLTF.preload(FLAMINGO_PATH)
 
-const sanitize = (value) => {
-  return value
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
+// Sanitizza solo per rimuovere tag HTML pericolosi, mantiene gli spazi
+const sanitizeForSubmit = (value) => {
+  return value.replace(/<[^>]*>/g, '').trim()
 }
 
 const ContactFlamingo = ({ isFlying, isFlyingAway, onFlyAwayComplete }) => {
@@ -121,7 +119,9 @@ const Contact = () => {
 
   const handleChange = ({ target: { name, value } }) => {
     if (alert.show) hideAlert()
-    setForm({ ...form, [name]: sanitize(value) })
+    
+    // NON sanitizziamo durante la digitazione, solo salviamo il valore grezzo
+    setForm({ ...form, [name]: value })
   }
 
   const handleFocus = () => setIsFlying(true)
@@ -130,7 +130,11 @@ const Contact = () => {
   const validateForm = () => {
     const newErrors = {}
 
-    if (!form.name || form.name.length < 3) {
+    // Validiamo con trim ma NON modifichiamo il form
+    const trimmedName = form.name.trim()
+    const trimmedMessage = form.message.trim()
+
+    if (!trimmedName || trimmedName.length < 3) {
       newErrors.name = 'Name and surname must have more than 3 letters'
     }
 
@@ -138,7 +142,7 @@ const Contact = () => {
       newErrors.email = 'Insert a valid email address'
     }
 
-    if (!form.message || form.message.length < 10) {
+    if (!trimmedMessage || trimmedMessage.length < 10) {
       newErrors.message = 'Your message must have more than 10 letters'
     }
 
@@ -157,22 +161,33 @@ const Contact = () => {
     setLoading(true)
     setIsFlyingAway(true)
 
+    // Sanitizziamo SOLO al momento dell'invio
+    const sanitizedData = {
+      from_name: sanitizeForSubmit(form.name),
+      to_name: 'Stefania Galazzo',
+      from_email: sanitizeForSubmit(form.email),
+      to_email: 'galazzostefania@gmail.com',
+      message: sanitizeForSubmit(form.message),
+    }
+
+    // Log per debug EmailJS
+    console.log('📧 EmailJS Configuration:')
+    console.log('Service ID:', import.meta.env.VITE_APP_EMAILJS_SERVICE_ID)
+    console.log('Template ID:', import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID)
+    console.log('Public Key:', import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY)
+    console.log('Sanitized data:', sanitizedData)
+
     emailjs
       .send(
         import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          to_name: 'Stefania Galazzo',
-          from_email: form.email,
-          to_email: 'galazzostefania@gmail.com',
-          message: form.message,
-        },
+        sanitizedData,
         import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY
       )
       .then(
-        () => {
+        (response) => {
           setLoading(false)
+          console.log('✅ Email sent successfully!', response)
           showAlert({
             show: true,
             text: 'Thank you for your message 😃',
@@ -181,11 +196,11 @@ const Contact = () => {
 
           setTimeout(() => {
             hideAlert(false)
-          }, [3000])
+          }, 3000)
         },
         (error) => {
           setLoading(false)
-          console.error(error)
+          console.error('❌ Email sending failed:', error)
           setIsFlyingAway(false)
 
           showAlert({
